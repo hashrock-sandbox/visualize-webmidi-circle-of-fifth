@@ -21,6 +21,7 @@
     "email": "hashrock@users.noreply.github.com"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "normalize.css": "^7.0.0",
     "object-assign": "^4.1.1",
     "piu": "^1.0.0",

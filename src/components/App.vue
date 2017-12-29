@@ -8,10 +8,12 @@
     </div>
 
     <svg width=300 height=300>
+     <polygon :points="points"></polygon>
     </svg>
 
     <div>Chord: {{chords}}</div>
     <div>{{notenames}}</div>
+    <div>{{cof}}</div>
     
     <!--
         <svg width=300 height=50>
@@ -24,23 +26,37 @@
 
 <script>
 var piu = require("piu");
+var _ = require("lodash");
 var teoria = require("teoria");
 var synth;
 var MidiIn;
 var dict = [
-  { pos: 0, name: "C" },
-  { pos: 0.5, name: "Db" },
-  { pos: 1, name: "D" },
-  { pos: 1.5, name: "Eb" },
-  { pos: 2, name: "E" },
-  { pos: 3, name: "F" },
-  { pos: 3.5, name: "Gb" },
-  { pos: 4, name: "G" },
-  { pos: 4.5, name: "Ab" },
-  { pos: 5, name: "A" },
-  { pos: 5.5, name: "Bb" },
-  { pos: 6, name: "B" }
+  { cof: 0, pos: 0, name: "C" },
+  { cof: 7, pos: 0.5, name: "Db" },
+  { cof: 2, pos: 1, name: "D" },
+  { cof: 9, pos: 1.5, name: "Eb" },
+  { cof: 4, pos: 2, name: "E" },
+  { cof: 11, pos: 3, name: "F" },
+  { cof: 6, pos: 3.5, name: "Gb" },
+  { cof: 1, pos: 4, name: "G" },
+  { cof: 8, pos: 4.5, name: "Ab" },
+  { cof: 3, pos: 5, name: "A" },
+  { cof: 10, pos: 5.5, name: "Bb" },
+  { cof: 5, pos: 6, name: "B" }
 ];
+function valueToPoint(value, index, total) {
+  var x = 0;
+  var y = -value * 0.8;
+  var angle = Math.PI * 2 / total * index;
+  var cos = Math.cos(angle);
+  var sin = Math.sin(angle);
+  var tx = x * cos - y * sin + 150;
+  var ty = x * sin + y * cos + 150;
+  return {
+    x: tx,
+    y: ty
+  };
+}
 
 export default {
   name: "app",
@@ -48,20 +64,37 @@ export default {
     return {
       ports: [],
       selectedId: "",
-      notes: []
+      notes: [],
+      stats: [0, 4, 5]
     };
   },
   computed: {
+    points() {
+      return this.cof
+        .map((stat, i) => {
+          var point = valueToPoint(100, stat, 12);
+          return point.x + "," + point.y;
+        })
+        .join(" ");
+    },
     notenames() {
       return this.notes.map(i => {
         return dict[i % 12].name;
       });
     },
+    cof() {
+      if (this.notes.length === 0) {
+        return [];
+      }
+      return _.uniq(this.notes.map(i => dict[i % 12].cof)).sort(
+        (a, b) => a - b
+      );
+    },
     chords() {
       return piu
         .infer(this.notenames.map(teoria.note))
         .map(piu.name)
-        .map(n => n.replace(/undefined/, "?"))
+        .map(n => n.replace(/undefined/, "?"));
     }
   },
   watch: {
@@ -99,10 +132,14 @@ export default {
 };
 </script>
 <style>
-body{
-  background: #EEE;
+body {
+  background: #eee;
 }
-svg{
+svg {
   background: white;
+}
+polygon {
+  fill: #42b983;
+  opacity: 0.75;
 }
 </style>
