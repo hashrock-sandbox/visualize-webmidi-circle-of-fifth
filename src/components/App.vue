@@ -9,18 +9,15 @@
 
     <svg width=300 height=300>
      <polygon :points="points"></polygon>
-     <text alignment-baseline="middle" text-anchor="middle" v-for="(label, idx) in cofLabels" :key="idx" :x="label.x" :y="label.y">{{label.name}}</text>
+     <g v-for="(label, idx) in cofLabels" :key="idx" :transform="'translate('+ label.x + ','+label.y+')'">
+      <circle v-if="label.use" cx=0 cy=0 r=20 class="use-tone"></circle>
+      <text alignment-baseline="middle" text-anchor="middle" :class="{'root': label.root}">{{label.name}}</text>
+     </g>
     </svg>
 
     <div>Chord: {{chords}}</div>
     <div>{{notenames}}</div>
     <div>{{cof}}</div>
-    <!--
-        <svg width=300 height=50>
-      <rect v-for="k in keys" :key="k"></rect>
-    </svg>
-    -->
-
   </div>
 </template>
 
@@ -65,7 +62,7 @@ export default {
       ports: [],
       selectedId: "",
       notes: [],
-      stats: [0, 4, 5],
+      stats: [0, 4, 5]
     };
   },
   computed: {
@@ -82,13 +79,22 @@ export default {
         return dict[i % 12].name;
       });
     },
+    lowestNote() {
+      return this.notes.slice().sort((a,b)=>(a-b))[0];
+    },
+    lowestNoteName(){
+      if(this.lowestNote){
+        return dict[this.lowestNote % 12].name;
+      }
+      return ""
+    },
     cof() {
       if (this.notes.length === 0) {
         return [];
       }
-      return _.uniq(this.notes.map(i => dict[i % 12].cof)).slice().sort(
-        (a, b) => a - b
-      );
+      return _.uniq(this.notes.map(i => dict[i % 12].cof))
+        .slice()
+        .sort((a, b) => a - b);
     },
     chords() {
       return piu
@@ -97,16 +103,20 @@ export default {
         .map(n => n.replace(/undefined/, "?"));
     },
     cofLabels() {
-      return dict.slice().sort((a,b)=>(a.cof - b.cof)).map((a, i)=>{
-        const p = valueToPoint(120, i, 12);
-        return {
-          name: a.name,
-          x: p.x,
-          y: p.y
-        }
-      })
-    },
-
+      return dict
+        .slice()
+        .sort((a, b) => a.cof - b.cof)
+        .map((a, i) => {
+          const p = valueToPoint(120, i, 12);
+          return {
+            name: a.name,
+            x: p.x,
+            y: p.y,
+            use: this.notenames.find((i) => i === a.name),
+            root: this.lowestNoteName === a.name
+          };
+        });
+    }
   },
   watch: {
     selectedId(val, old) {
@@ -152,5 +162,13 @@ svg {
 polygon {
   fill: #42b983;
   opacity: 0.75;
+}
+.use-tone{
+  fill: #42b983;
+  opacity: 0.2;
+}
+.root{
+  font-weight: 900;
+  font-size: 1.5rem;
 }
 </style>
