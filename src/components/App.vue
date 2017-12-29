@@ -8,11 +8,11 @@
     </div>
 
     <svg width=300 height=300>
-     <polygon :points="points"></polygon>
-     <g v-for="(label, idx) in cofLabels" :key="idx" :transform="'translate('+ label.x + ','+label.y+')'">
-      <circle v-if="label.use" cx=0 cy=0 r=20 class="use-tone"></circle>
-      <text alignment-baseline="middle" text-anchor="middle" :class="{'root': label.root}">{{label.name}}</text>
-     </g>
+      <polygon :points="points"></polygon>
+      <g v-for="(label, idx) in cofLabels" :key="idx" :transform="'translate('+ label.x + ','+label.y+')'">
+        <circle v-if="label.use" cx=0 cy=0 r=20 class="use-tone"></circle>
+        <text alignment-baseline="middle" text-anchor="middle" :class="{'root': label.root}">{{label.name}}</text>
+      </g>
     </svg>
 
     <div>Chord: {{chords}}</div>
@@ -80,13 +80,13 @@ export default {
       });
     },
     lowestNote() {
-      return this.notes.slice().sort((a,b)=>(a-b))[0];
+      return this.notes.slice().sort((a, b) => a - b)[0];
     },
-    lowestNoteName(){
-      if(this.lowestNote){
+    lowestNoteName() {
+      if (this.lowestNote) {
         return dict[this.lowestNote % 12].name;
       }
-      return ""
+      return "";
     },
     cof() {
       if (this.notes.length === 0) {
@@ -112,7 +112,7 @@ export default {
             name: a.name,
             x: p.x,
             y: p.y,
-            use: this.notenames.find((i) => i === a.name),
+            use: this.notenames.find(i => i === a.name),
             root: this.lowestNoteName === a.name
           };
         });
@@ -163,11 +163,11 @@ polygon {
   fill: #42b983;
   opacity: 0.75;
 }
-.use-tone{
+.use-tone {
   fill: #42b983;
   opacity: 0.2;
 }
-.root{
+.root {
   font-weight: 900;
   font-size: 1.5rem;
 }
