@@ -9,12 +9,12 @@
 
     <svg width=300 height=300>
      <polygon :points="points"></polygon>
+     <text alignment-baseline="middle" text-anchor="middle" v-for="(label, idx) in cofLabels" :key="idx" :x="label.x" :y="label.y">{{label.name}}</text>
     </svg>
 
     <div>Chord: {{chords}}</div>
     <div>{{notenames}}</div>
     <div>{{cof}}</div>
-    
     <!--
         <svg width=300 height=50>
       <rect v-for="k in keys" :key="k"></rect>
@@ -65,7 +65,7 @@ export default {
       ports: [],
       selectedId: "",
       notes: [],
-      stats: [0, 4, 5]
+      stats: [0, 4, 5],
     };
   },
   computed: {
@@ -86,7 +86,7 @@ export default {
       if (this.notes.length === 0) {
         return [];
       }
-      return _.uniq(this.notes.map(i => dict[i % 12].cof)).sort(
+      return _.uniq(this.notes.map(i => dict[i % 12].cof)).slice().sort(
         (a, b) => a - b
       );
     },
@@ -95,7 +95,18 @@ export default {
         .infer(this.notenames.map(teoria.note))
         .map(piu.name)
         .map(n => n.replace(/undefined/, "?"));
-    }
+    },
+    cofLabels() {
+      return dict.slice().sort((a,b)=>(a.cof - b.cof)).map((a, i)=>{
+        const p = valueToPoint(120, i, 12);
+        return {
+          name: a.name,
+          x: p.x,
+          y: p.y
+        }
+      })
+    },
+
   },
   watch: {
     selectedId(val, old) {
