@@ -23,8 +23,10 @@
   "dependencies": {
     "normalize.css": "^7.0.0",
     "object-assign": "^4.1.1",
+    "piu": "^1.0.0",
     "promise-polyfill": "^6.0.2",
     "sharp11": "^2.0.2",
+    "teoria": "^2.5.0",
     "webaudio-instruments": "^0.4.1"
   },
   "devDependencies": {
